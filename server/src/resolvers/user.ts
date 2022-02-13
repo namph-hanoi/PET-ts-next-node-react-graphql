@@ -8,7 +8,7 @@ import {
 	Resolver,
 	Root
 } from 'type-graphql'
-import argon2 from 'argon2'
+import { compare, hash } from 'bcryptjs'
 import { UserMutationResponse } from '../types/UserMutationResponse'
 import { RegisterInput } from '../types/RegisterInput'
 import { validateRegisterInput } from '../utils/validateRegisterInput'
@@ -64,7 +64,7 @@ export class UserResolver {
 					]
 				}
 
-			const hashedPassword = await argon2.hash(password)
+			const hashedPassword = await hash(password, 12)
 
 			const newUser = User.create({
 				username,
@@ -114,7 +114,7 @@ export class UserResolver {
 					]
 				}
 
-			const passwordValid = await argon2.verify(existingUser.password, password)
+			const passwordValid = await compare(password, existingUser.password)
 
 			if (!passwordValid)
 				return {
@@ -169,7 +169,7 @@ export class UserResolver {
 		await TokenModel.findOneAndDelete({ userId: `${user.id}` })
 
 		const resetToken = uuidv4()
-		const hashedResetToken = await argon2.hash(resetToken)
+		const hashedResetToken = await hash(resetToken, 12)
 
 		// save token to db
 		await new TokenModel({
@@ -220,7 +220,7 @@ export class UserResolver {
 				}
 			}
 
-			const resetPasswordTokenValid = argon2.verify(
+			const resetPasswordTokenValid = compare(
 				resetPasswordTokenRecord.token,
 				token
 			)
@@ -251,7 +251,7 @@ export class UserResolver {
 				}
 			}
 
-			const updatedPassword = await argon2.hash(changePasswordInput.newPassword)
+			const updatedPassword = await hash(changePasswordInput.newPassword, 12)
 			await User.update({ id: userIdNum }, { password: updatedPassword })
 
 			await resetPasswordTokenRecord.deleteOne()
