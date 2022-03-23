@@ -24,9 +24,14 @@ const main = async () => {
 	const connection = await createConnection({
 		type: 'postgres',
 		...(__prod__
-			? { url: process.env.DATABASE_URL }
+			? {
+				url: process.env.DATABASE_URL,
+				host: 'pet_db',
+
+			}
 			: {
-					database: 'reddit',
+					host: 'pet_db',
+					database: 'namphdb',
 					username: process.env.DB_USERNAME_DEV,
 					password: process.env.DB_PASSWORD_DEV
 			  }),
@@ -60,7 +65,7 @@ const main = async () => {
 	)
 
 	// Session/Cookie store
-	const mongoUrl = `mongodb+srv://${process.env.SESSION_DB_USERNAME_DEV_PROD}:${process.env.SESSION_DB_PASSWORD_DEV_PROD}@cluster0.vggl0.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
+	const mongoUrl = `mongodb+srv://${process.env.SESSION_DB_USERNAME_DEV_PROD}:${process.env.SESSION_DB_PASSWORD_DEV_PROD}@cluster0.jr6h5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
 	await mongoose.connect(mongoUrl, {
 		useCreateIndex: true,
 		useNewUrlParser: true,

@@ -15,6 +15,16 @@ import fetch from 'isomorphic-unfetch'
 import { onError } from '@apollo/client/link/error'
 import Router from 'next/router'
 
+const [
+	NODE_ENV,
+	DEV_URL_API_FROM_CLIENT_VIEW,
+	DEV_URL_API_FROM_SERVER_VIEW
+ ] = [
+	process.env.NODE_ENV,
+	process.env.DEV_URL_API_FROM_CLIENT_VIEW,
+	process.env.DEV_URL_API_FROM_SERVER_VIEW
+];
+
 export const APOLLO_STATE_PROP_NAME = '__APOLLO_STATE__'
 
 let apolloClient: ApolloClient<NormalizedCacheObject>
@@ -47,18 +57,23 @@ function createApolloClient(headers: IncomingHttpHeaders | null = null) {
 		})
 	}
 
+	const ssrMode = typeof window === 'undefined';
+
+	// Adjust the hosts file in the FE server, otherwise use the whichURI
+	const whichURI = typeof window === 'undefined' ? DEV_URL_API_FROM_SERVER_VIEW : DEV_URL_API_FROM_CLIENT_VIEW;
+
 	const httpLink = new HttpLink({
 		// uri: 'http://localhost:4000/graphql', // Server URL (must be absolute)
 		uri:
-			process.env.NODE_ENV === 'production'
+			NODE_ENV === 'production'
 				? 'https://sleepy-castle-81019.herokuapp.com/graphql'
-				: 'http://localhost:4000/graphql',
+				: whichURI,
 		credentials: 'include', // Additional fetch() options like `credentials` or `headers`
 		fetch: enhancedFetch
 	})
 
 	return new ApolloClient({
-		ssrMode: typeof window === 'undefined',
+		ssrMode,
 		link: from([errorLink, httpLink]),
 		cache: new InMemoryCache({
 			typePolicies: {

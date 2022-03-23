@@ -3,3 +3,5 @@ server/node_modules
 server/.env
 server/ormconfig.json
 *.txt
+.env
+nginx/config/default.conf
