@@ -4,10 +4,12 @@ import express from 'express'
 import { createConnection } from 'typeorm'
 import { User } from './entities/User'
 import { Post } from './entities/Post'
+import { CardDeck } from './entities/CardDeck'
 import { ApolloServer } from 'apollo-server-express'
 import { buildSchema } from 'type-graphql'
 import { HelloResolver } from './resolvers/hello'
 import { UserResolver } from './resolvers/user'
+import { CardDeckResolver } from './resolvers/cardDeck'
 import mongoose from 'mongoose'
 import MongoStore from 'connect-mongo'
 import session from 'express-session'
@@ -47,7 +49,7 @@ const main = async () => {
 			  }
 			: {}),
 		...(__prod__ ? {} : { synchronize: true }),
-		entities: [User, Post, Upvote],
+		entities: [User, Post, Upvote, CardDeck],
 		migrations: [path.join(__dirname, '/migrations/*')]
 	})
 
@@ -95,7 +97,7 @@ const main = async () => {
 
 	const apolloServer = new ApolloServer({
 		schema: await buildSchema({
-			resolvers: [HelloResolver, UserResolver, PostResolver],
+			resolvers: [HelloResolver, UserResolver, PostResolver, CardDeckResolver],
 			validate: false
 		}),
 		context: ({ req, res }): Context => ({

@@ -10,6 +10,7 @@ import {
 } from 'typeorm'
 import { Post } from './Post'
 import { Upvote } from './Upvote'
+import { CardDeck } from './CardDeck'
 
 @ObjectType()
 @Entity() // db table
@@ -31,6 +32,9 @@ export class User extends BaseEntity {
 
 	@OneToMany(() => Post, post => post.user)
 	posts: Post[]
+
+	@OneToMany(() => CardDeck, cardDeck => cardDeck.user)
+	cardDecks: CardDeck[]
 
 	@OneToMany(_to => Upvote, upvote => upvote.user)
 	upvotes: Upvote[]
